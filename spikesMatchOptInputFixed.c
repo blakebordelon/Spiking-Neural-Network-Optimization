@@ -190,14 +190,14 @@ int main()
 
 
 	
-	// initialize reference and naive networks. Here the optimized network is drawn from a distribution with upper bound 5 times that of ref's
+	// initialize reference and naive networks. Here the optimized network is drawn from a distribution with upper bound 1.2 times that of ref's. In addition, 40% of reference network's initial weights set to 0.
 
 
 	for(i=0; i<size; i++)
 	{
 		for(j=0; j<size; j++)
 		{
-			optNet[i][j] = 5*(rand() % scaler) * factor;
+			optNet[i][j] = 1.3*(rand() % scaler) * factor;
 			refNet[i][j] = (rand() % scaler) * factor;
 			
 			if((rand() % 100) < 20)
