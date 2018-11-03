@@ -28,7 +28,7 @@ double refScaling = .23;
 
 //network size; ie. number of neurons
 
-int size = 400;
+int size = 500;
 
 // voltage threshold in Volts
 
@@ -47,19 +47,19 @@ double step = 0.003;
 
 //int numSteps = 10000;
 
-int numSteps = 5000;
+int numSteps = 10000;
 
 // for generating random numbers
 
 
 //double factor = .000005;
 
-double factor = .0000015;
+double factor =     .000001;
 
 //double factor = 0;
 
 
-int maxLoopCount = 150;
+int maxLoopCount = 100;
 
 
 // for reading in a weight matrix from a 'weights.csv' file in the directory if provided
@@ -67,19 +67,27 @@ double weightScale = 3;
 
 
 // maximum size of an individual weight modification that can be made during optimization
-//double epsilon = .0000000001;
 
-//double epsilon   = .0000000001;
 
-double epsilon =     .0000008;
+//double epsilon =.0000008;
 
-//double epsilon = .000000001
+double epsilon =  .00000001;
+
+double weightMean = .0004;
+//double weightVar = 0;
+double weightVar  = .0004;
+
+//double weightMean = 0;
+//double weightVar = 0;
 
 //double rescale = .000000001;
 
 //double rescale =   .0000000001;
-double rescale   =   .00000000005;
+//double rescale   =   .0000000025;
 
+//double rescale = .0000000001;
+
+double rescale =   .000000001;
 int maxSepDistDecrementer = 15;
 
 // simulate the network with given input stimulating currents. Outputs are spike trains.
@@ -213,7 +221,11 @@ int main()
 	// in this file: same inhibitory neurons for opt and ref
 	
 	
-	int numInhibitory = (int) (size * .2);
+//	int numInhibitory = (int) (size * .2);
+
+//	int numInhibitory = (int) (.2*size);
+
+	int numInhibitory = 0;
 
 	int * inhibIndices = (int *) malloc(numInhibitory * sizeof(int));
 	//set all inhib indices to 0
@@ -264,9 +276,39 @@ int main()
 			
 
 			optNetControl[i][j] = optNet[i][j];
-			printf("optNet[%d][%d] = %lf\n", j, i, optNet[j][i]);
+	//		printf("optNet[%d][%d] = %lf\n", j, i, optNet[j][i]);
 		}
 	}
+
+
+
+        for(i=0; i<size; i++)
+        {
+                for(j=0; j<size; j++)
+                {
+                        double U1 = 1.0*(rand() % 1000) / 1000.0;
+                        double U2 = 1.0 * (rand() % 1000)/1000.0;
+
+                        while(U1 == 0)
+                        {
+                                U1 = 1.0*(rand() % 1000) / 1000.0;
+
+                        }
+                        double Z1 = sqrt(-2*log(U1))*cos(2*3.14159 * U2);
+
+                        double val = weightVar * Z1 + weightMean;
+                        optNet[i][j] = val;
+			optNetControl[i][j] = optNet[i][j];
+                }
+        }
+
+	
+
+
+
+
+
+
 
 
 
@@ -327,11 +369,11 @@ int main()
 	
 
 	// generate outputs by simulating ref
-	simulate2(outputs, refNet, inputs, refstatemat, refSynCurrentRatio, refSynPercent);
+//	simulate2(outputs, refNet, inputs, refstatemat, refSynCurrentRatio, refSynPercent);
 
 	
 
-//	loadSpikes(outputs);
+	loadSpikes(outputs);
 
 
 	int numSpikesOutputs = 0;
@@ -407,7 +449,7 @@ for(i=0; i<size; i++)
 }
 
 printf("countspikes: %d\n", countspikes);
-
+printf("spikerate: %lf\n", countspikes/(size*numSteps*step));
 
 FILE * initialoutputs = fopen("initialoutputs.txt","w+");
 
